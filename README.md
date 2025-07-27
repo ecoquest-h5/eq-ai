@@ -19,7 +19,7 @@ poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ### 물체 감지
 
 - **POST** `/api/v1/detection/detect`
-  - 이미지 파일 업로드
+  - 이미지 URL을 body로 전송
   - 지원하는 물체 타입: `hand`, `face`, `pose`, `chair`, `cup`, `camera`, `shoe`
 
 ### 헬스 체크
@@ -31,9 +31,35 @@ poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/detection/detect" \
-  -H "accept: application/json" \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@image.jpg" \
-  -F "object_type=hand" \
-  -F "confidence_threshold=0.5"
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_url": "https://example.com/image.jpg",
+    "object_type": "hand",
+    "confidence_threshold": 0.5
+  }'
+```
+
+## 요청 형식
+
+```json
+{
+  "image_url": "https://example.com/image.jpg",
+  "object_type": "hand",
+  "confidence_threshold": 0.5
+}
+```
+
+## 응답 형식
+
+```json
+{
+  "success": true,
+  "result": {
+    "detected": true,
+    "confidence": 0.85,
+    "bounding_box": null,
+    "landmarks": [[0.1, 0.2, 0.3], ...]
+  },
+  "message": "hand이(가) 감지되었습니다"
+}
 ```

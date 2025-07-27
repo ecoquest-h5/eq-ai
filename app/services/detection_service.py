@@ -4,6 +4,9 @@ import numpy as np
 from typing import Tuple, Optional, List
 from PIL import Image
 import io
+import requests
+import tempfile
+import os
 
 
 class DetectionService:
@@ -12,6 +15,26 @@ class DetectionService:
         self.mp_face = mp.solutions.face_detection
         self.mp_pose = mp.solutions.pose
         self.mp_objectron = mp.solutions.objectron
+        
+    def download_image_from_url(self, url: str) -> bytes:
+        """URL에서 이미지를 다운로드합니다."""
+        try:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            return response.content
+        except requests.RequestException as e:
+            raise Exception(f"이미지 다운로드 실패: {str(e)}")
+    
+    def process_image_from_url(self, url: str) -> np.ndarray:
+        """URL에서 이미지를 다운로드하고 OpenCV 형식으로 변환합니다."""
+        image_bytes = self.download_image_from_url(url)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            raise Exception("이미지를 읽을 수 없습니다")
+        
+        return image
         
     def detect_hands(self, image: np.ndarray, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
         with self.mp_hands.Hands(
@@ -100,9 +123,9 @@ class DetectionService:
             
             return False, 0.0, None, None
     
-    def detect_object(self, image_bytes: bytes, object_type: str, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    def detect_object_from_url(self, url: str, object_type: str, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
+        """URL에서 이미지를 다운로드하고 물체를 감지합니다."""
+        image = self.process_image_from_url(url)
         
         if object_type == 'hand':
             return self.detect_hands(image, confidence_threshold)

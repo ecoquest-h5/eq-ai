@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
 class DetectionRequest(BaseModel):
+    image_url: HttpUrl
     object_type: str
     confidence_threshold: Optional[float] = 0.5
 
