@@ -3,9 +3,10 @@ import numpy as np
 from unittest.mock import patch, MagicMock
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from app.services.detection_service import DetectionService
-from config.detection_objects import detection_objects_config, DetectionObject
+from config.detection_objects import detection_objects_config
 
 
 @pytest.fixture
@@ -37,7 +38,6 @@ def test_config_initialization():
     config = detection_objects_config
     assert config is not None
     
-    # 기본 물체들이 있는지 확인
     supported_objects = config.get_supported_objects()
     assert 'hand' in supported_objects
     assert 'face' in supported_objects
@@ -49,13 +49,11 @@ def test_get_object():
     """물체 정보 가져오기 테스트"""
     config = detection_objects_config
     
-    # 존재하는 물체
     hand_obj = config.get_object('hand')
     assert hand_obj.name == 'hand'
     assert hand_obj.model_type == 'hands'
     assert hand_obj.model_name == 'Hands'
     
-    # 존재하지 않는 물체
     with pytest.raises(ValueError, match="지원하지 않는 물체 타입입니다"):
         config.get_object('nonexistent')
 

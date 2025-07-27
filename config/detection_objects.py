@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List
 from dataclasses import dataclass
 
 
@@ -20,60 +20,15 @@ class DetectionObjectsConfig:
     def _initialize_objects(self) -> Dict[str, DetectionObject]:
         """감지 가능한 물체들을 초기화합니다."""
         return {
-            'hand': DetectionObject(
-                name='hand',
-                model_type='hands',
-                model_name='Hands',
-                description='손 감지 (MediaPipe Hands)'
-            ),
-            'face': DetectionObject(
-                name='face',
-                model_type='face_detection',
-                model_name='FaceDetection',
-                description='얼굴 감지 (MediaPipe Face Detection)'
-            ),
-            'pose': DetectionObject(
-                name='pose',
-                model_type='pose',
-                model_name='Pose',
-                description='자세 감지 (MediaPipe Pose)'
-            ),
-            'chair': DetectionObject(
-                name='chair',
-                model_type='objectron',
-                model_name='Chair',
-                description='의자 감지 (MediaPipe Objectron)'
-            ),
-            'cup': DetectionObject(
-                name='cup',
-                model_type='objectron',
-                model_name='Cup',
-                description='컵 감지 (MediaPipe Objectron)'
-            ),
-            'camera': DetectionObject(
-                name='camera',
-                model_type='objectron',
-                model_name='Camera',
-                description='카메라 감지 (MediaPipe Objectron)'
-            ),
-            'shoe': DetectionObject(
-                name='shoe',
-                model_type='objectron',
-                model_name='Shoe',
-                description='신발 감지 (MediaPipe Objectron)'
-            ),
-            'bottle': DetectionObject(
-                name='bottle',
-                model_type='objectron',
-                model_name='Bottle',
-                description='병 감지 (MediaPipe Objectron)'
-            ),
-            'bowl': DetectionObject(
-                name='bowl',
-                model_type='objectron',
-                model_name='Bowl',
-                description='그릇 감지 (MediaPipe Objectron)'
-            )
+            'hand': DetectionObject('hand', 'hands', 'Hands', '손 감지 (MediaPipe Hands)'),
+            'face': DetectionObject('face', 'face_detection', 'FaceDetection', '얼굴 감지 (MediaPipe Face Detection)'),
+            'pose': DetectionObject('pose', 'pose', 'Pose', '자세 감지 (MediaPipe Pose)'),
+            'chair': DetectionObject('chair', 'objectron', 'Chair', '의자 감지 (MediaPipe Objectron)'),
+            'cup': DetectionObject('cup', 'objectron', 'Cup', '컵 감지 (MediaPipe Objectron)'),
+            'camera': DetectionObject('camera', 'objectron', 'Camera', '카메라 감지 (MediaPipe Objectron)'),
+            'shoe': DetectionObject('shoe', 'objectron', 'Shoe', '신발 감지 (MediaPipe Objectron)'),
+            'bottle': DetectionObject('bottle', 'objectron', 'Bottle', '병 감지 (MediaPipe Objectron)'),
+            'bowl': DetectionObject('bowl', 'objectron', 'Bowl', '그릇 감지 (MediaPipe Objectron)')
         }
     
     def get_object(self, object_name: str) -> DetectionObject:

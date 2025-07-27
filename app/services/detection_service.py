@@ -2,13 +2,10 @@ import cv2
 import mediapipe as mp
 import numpy as np
 from typing import Tuple, Optional, List
-from PIL import Image
-import io
 import requests
-import tempfile
-import os
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from config.detection_objects import detection_objects_config
 
@@ -52,13 +49,10 @@ class DetectionService:
             if results.multi_hand_landmarks:
                 landmarks = []
                 for hand_landmarks in results.multi_hand_landmarks:
-                    hand_points = []
                     for landmark in hand_landmarks.landmark:
-                        hand_points.append([landmark.x, landmark.y, landmark.z])
-                    landmarks.extend(hand_points)
+                        landmarks.append([landmark.x, landmark.y, landmark.z])
                 
-                confidence = 0.8
-                return True, confidence, None, landmarks
+                return True, 0.8, None, landmarks
             
             return False, 0.0, None, None
     
@@ -97,13 +91,11 @@ class DetectionService:
                 for landmark in results.pose_landmarks.landmark:
                     landmarks.append([landmark.x, landmark.y, landmark.z])
                 
-                confidence = 0.8
-                return True, confidence, None, landmarks
+                return True, 0.8, None, landmarks
             
             return False, 0.0, None, None
     
     def detect_objects(self, image: np.ndarray, object_type: str, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
-        # config에서 물체 정보 가져오기
         detection_object = self.config.get_object(object_type)
         
         if detection_object.model_type != 'objectron':
@@ -120,8 +112,7 @@ class DetectionService:
             if results.detected_objects:
                 detected_object = results.detected_objects[0]
                 
-                # Objectron의 출력 구조에 따라 confidence 처리
-                confidence = 0.8  # 기본값
+                confidence = 0.8
                 try:
                     if hasattr(detected_object, 'score') and detected_object.score:
                         confidence = detected_object.score[0]
@@ -143,8 +134,6 @@ class DetectionService:
     def detect_object_from_url(self, url: str, object_type: str, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
         """URL에서 이미지를 다운로드하고 물체를 감지합니다."""
         image = self.process_image_from_url(url)
-        
-        # config에서 물체 정보 가져오기
         detection_object = self.config.get_object(object_type)
         
         if detection_object.model_type == 'hands':

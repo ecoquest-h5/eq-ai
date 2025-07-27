@@ -3,6 +3,7 @@ from app.models.schemas import DetectionRequest, DetectionResponse, DetectionRes
 from app.services.detection_service import DetectionService
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
 from config.detection_objects import detection_objects_config
 
@@ -26,11 +27,7 @@ async def detect_object(request: DetectionRequest):
         
         message = f"{request.object_type}이(가) 감지되었습니다" if detected else f"{request.object_type}이(가) 감지되지 않았습니다"
         
-        return DetectionResponse(
-            success=True,
-            result=result,
-            message=message
-        )
+        return DetectionResponse(success=True, result=result, message=message)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"감지 중 오류가 발생했습니다: {str(e)}")
