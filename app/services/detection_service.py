@@ -7,6 +7,10 @@ import io
 import requests
 import tempfile
 import os
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from config.detection_objects import detection_objects_config
 
 
 class DetectionService:
@@ -15,6 +19,7 @@ class DetectionService:
         self.mp_face = mp.solutions.face_detection
         self.mp_pose = mp.solutions.pose
         self.mp_objectron = mp.solutions.objectron
+        self.config = detection_objects_config
         
     def download_image_from_url(self, url: str) -> bytes:
         """URL에서 이미지를 다운로드합니다."""
@@ -98,17 +103,18 @@ class DetectionService:
             return False, 0.0, None, None
     
     def detect_objects(self, image: np.ndarray, object_type: str, confidence_threshold: float = 0.5) -> Tuple[bool, float, Optional[List[float]], Optional[List[List[float]]]]:
-        objectron_models = {
-            'chair': self.mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=confidence_threshold, model_name='Chair'),
-            'cup': self.mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=confidence_threshold, model_name='Cup'),
-            'camera': self.mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=confidence_threshold, model_name='Camera'),
-            'shoe': self.mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=confidence_threshold, model_name='Shoe')
-        }
+        # config에서 물체 정보 가져오기
+        detection_object = self.config.get_object(object_type)
         
-        if object_type not in objectron_models:
-            return False, 0.0, None, None
+        if detection_object.model_type != 'objectron':
+            raise ValueError(f"잘못된 모델 타입입니다: {detection_object.model_type}")
         
-        with objectron_models[object_type] as objectron:
+        with self.mp_objectron.Objectron(
+            static_image_mode=True, 
+            max_num_objects=5, 
+            min_detection_confidence=confidence_threshold, 
+            model_name=detection_object.model_name
+        ) as objectron:
             results = objectron.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
             
             if results.detected_objects:
@@ -138,11 +144,16 @@ class DetectionService:
         """URL에서 이미지를 다운로드하고 물체를 감지합니다."""
         image = self.process_image_from_url(url)
         
-        if object_type == 'hand':
+        # config에서 물체 정보 가져오기
+        detection_object = self.config.get_object(object_type)
+        
+        if detection_object.model_type == 'hands':
             return self.detect_hands(image, confidence_threshold)
-        elif object_type == 'face':
+        elif detection_object.model_type == 'face_detection':
             return self.detect_faces(image, confidence_threshold)
-        elif object_type == 'pose':
+        elif detection_object.model_type == 'pose':
             return self.detect_pose(image, confidence_threshold)
+        elif detection_object.model_type == 'objectron':
+            return self.detect_objects(image, object_type, confidence_threshold)
         else:
-            return self.detect_objects(image, object_type, confidence_threshold) 
+            raise ValueError(f"지원하지 않는 모델 타입입니다: {detection_object.model_type}") 

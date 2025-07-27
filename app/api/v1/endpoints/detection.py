@@ -1,6 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import DetectionRequest, DetectionResponse, DetectionResult
 from app.services.detection_service import DetectionService
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+from config.detection_objects import detection_objects_config
 
 router = APIRouter()
 detection_service = DetectionService()
@@ -30,6 +34,28 @@ async def detect_object(request: DetectionRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"감지 중 오류가 발생했습니다: {str(e)}")
+
+
+@router.get("/objects")
+async def get_supported_objects():
+    """지원되는 물체 목록을 반환합니다."""
+    try:
+        objects = detection_objects_config.get_all_objects()
+        return {
+            "success": True,
+            "objects": [
+                {
+                    "name": obj.name,
+                    "model_type": obj.model_type,
+                    "model_name": obj.model_name,
+                    "description": obj.description,
+                    "supported": obj.supported
+                }
+                for obj in objects.values()
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"물체 목록 조회 중 오류가 발생했습니다: {str(e)}")
 
 
 @router.get("/health")
