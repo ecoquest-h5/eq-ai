@@ -4,9 +4,20 @@ MediaPipe와 OpenCV를 사용한 물체 감지 API
 
 ## 설치 및 실행
 
+### 로컬 실행
+
 ```bash
-poetry install
-poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+poetry install mediapipe==0.10.7
+pip3 install 
+poetry run python3 main.py
+```
+
+### Docker 실행
+
+```bash
+# 프로덕션 빌드
+docker build -t ecoquest-ai .
+docker run -p 8000:8000 ecoquest-ai
 ```
 
 ## API 엔드포인트
@@ -62,5 +73,9 @@ ai/
 │   └── services/          # 비즈니스 로직
 ├── config/                # 설정 파일
 │   └── detection_objects.py
-└── tests/                 # 테스트
+├── tests/                 # 테스트
+├── Dockerfile             # Docker 설정
+├── docker-compose.yml     # Docker Compose 설정
+├── pyproject.toml         # 의존성 관리
+└── README.md              # 프로젝트 문서
 ```
