@@ -113,11 +113,22 @@ class DetectionService:
             
             if results.detected_objects:
                 detected_object = results.detected_objects[0]
-                confidence = detected_object.score[0]
+                
+                # Objectron의 출력 구조에 따라 confidence 처리
+                confidence = 0.8  # 기본값
+                try:
+                    if hasattr(detected_object, 'score') and detected_object.score:
+                        confidence = detected_object.score[0]
+                except (AttributeError, IndexError):
+                    pass
                 
                 landmarks = []
-                for landmark in detected_object.landmarks_2d.landmark:
-                    landmarks.append([landmark.x, landmark.y])
+                try:
+                    if hasattr(detected_object, 'landmarks_2d') and detected_object.landmarks_2d:
+                        for landmark in detected_object.landmarks_2d.landmark:
+                            landmarks.append([landmark.x, landmark.y])
+                except (AttributeError, IndexError):
+                    pass
                 
                 return True, confidence, None, landmarks
             
