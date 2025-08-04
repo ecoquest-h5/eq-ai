@@ -28,7 +28,14 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
+
+
+@app.get("/config/yolo-model")
+async def get_yolo_model_config():
+    """현재 설정된 YOLO 모델 타입을 반환합니다."""
+    return {"yolo_model_type": settings.yolo_model_type, "model_name": f"yolov8{settings.yolo_model_type}"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
