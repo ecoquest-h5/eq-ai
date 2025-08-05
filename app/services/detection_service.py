@@ -217,6 +217,32 @@ class DetectionService:
                 
                 return False, 0.0, None, None
             
+            # bottle 감지를 위한 특별 처리
+            if target_class_id == 40:  # bottle 클래스
+                for result in results:
+                    label_name = result.get('label', '').lower()
+                    score = result.get('score', 0.0)
+                    
+                    # bottle, cup, vase가 감지되면 bottle로 인식
+                    bottle_related_classes = ['bottle', 'cup', 'vase']
+                    
+                    if label_name in bottle_related_classes and score >= confidence_threshold:
+                        bbox = result['box']
+                        x1, y1, x2, y2 = bbox['xmin'], bbox['ymin'], bbox['xmax'], bbox['ymax']
+                        bounding_box = [float(x1), float(y1), float(x2 - x1), float(y2 - y1)]
+                        
+                        landmarks = [
+                            [float(x1), float(y1)],  # 좌상단
+                            [float(x2), float(y1)],  # 우상단
+                            [float(x2), float(y2)],  # 우하단
+                            [float(x1), float(y2)]   # 좌하단
+                        ]
+                        
+                        print(f"bottle 감지됨: {label_name} (신뢰도: {score}) - bottle/cup/vase 관련")
+                        return True, score, bounding_box, landmarks
+                
+                return False, 0.0, None, None
+            
             # 일반적인 감지 처리 (handbag)
             for result in results:
                 # label 키에서 클래스 이름 가져오기

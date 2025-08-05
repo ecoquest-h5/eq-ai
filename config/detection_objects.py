@@ -45,10 +45,10 @@ class DetectionObjectsConfig:
         """
         return {
             # YOLO v8 기반 객체들
-            'bottle': DetectionObject('bottle', 'yolo', 'bottle', '병 감지 (YOLO v8)'),
+            'bottle': DetectionObject('bottle', 'transformer', 'bottle/vase', '병 감지 (YOLO v8)', coco_class_id=40),
             'bicycle': DetectionObject('bicycle', 'yolo', 'bicycle', '자전거 감지 (YOLO v8)'),
-            'bus': DetectionObject('bus', 'yolo', 'bus', '버스 감지 (YOLO v8)'),
-            'train': DetectionObject('train', 'yolo', 'train', '기차 감지 (YOLO v8)'),
+            'bus': DetectionObject('bus', 'yolo', 'bus/train', '버스 감지 (YOLO v8)'),
+            'train': DetectionObject('train', 'yolo', 'bus/train', '기차 감지 (YOLO v8)'),
             'cup': DetectionObject('cup', 'yolo', 'cup', '컵 감지 (YOLO v8)'),
             'chair': DetectionObject('chair', 'yolo', 'chair', '의자 감지 (YOLO v8)'),
             'camera': DetectionObject('camera', 'yolo', 'cell phone', '카메라 감지 (YOLO v8)'),
